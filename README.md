@@ -1,5 +1,9 @@
 # Simple SNS
 
+## Application Architecture 
+![system architecture](./doc/SystemArchitecture.png)
+
+
 ## Flow Chart
 
 1. 회원가입
