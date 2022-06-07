@@ -14,6 +14,7 @@ Coded by www.creative-tim.com
 */
 
 import { useState } from 'react';
+import * as React from 'react';
 
 // react-router-dom components
 import { Link } from 'react-router-dom';
@@ -28,6 +29,7 @@ import MuiLink from '@mui/material/Link';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
+import { TransitionProps } from '@mui/material/transitions';
 
 // Material Dashboard 2 React components
 import MDBox from 'components/MDBox';
@@ -35,14 +37,42 @@ import MDTypography from 'components/MDTypography';
 import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+
 // Authentication layout components
 import BasicLayout from 'layouts/authentication/components/BasicLayout';
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import axios from 'axios';
 
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>,
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function Basic() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [open, setOpen] = React.useState(false);
+  const [dialogTitle, setDialogTitle] = React.useState('');
+  const [dialogMessage, setDialogMessage] = React.useState('');
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleSignIn = (event) => {
     console.log(userName);
@@ -57,10 +87,14 @@ function Basic() {
       },
     })
       .then((res) => {
+        console.log('success');
         const { accessToken } = res.data;
         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
       })
       .catch((error) => {
+        setDialogTitle(error.response.data.resultCode);
+        setDialogMessage(error.response.data.resultMessage);
+        setOpen(true);
         console.log(error);
       });
   };
@@ -126,6 +160,23 @@ function Basic() {
                   </MDBox>
                 </MDBox>
               </MDBox>
+              <Dialog
+                open={open}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={handleClose}
+                aria-describedby="alert-dialog-slide-description"
+              >
+                <DialogTitle>{dialogTitle}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-slide-description">
+                    {dialogMessage}
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>OK</Button>
+                </DialogActions>
+              </Dialog>
             </Card>
           </Grid>
         </Grid>

@@ -14,6 +14,7 @@ Coded by www.creative-tim.com
 */
 
 import { useState } from 'react';
+import * as React from 'react';
 // react-router-dom components
 import { Link } from 'react-router-dom';
 
@@ -21,6 +22,7 @@ import { Link } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
+import { TransitionProps } from '@mui/material/transitions';
 
 // Material Dashboard 2 React components
 import MDBox from 'components/MDBox';
@@ -28,13 +30,41 @@ import MDTypography from 'components/MDTypography';
 import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
 
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+
 // Authentication layout components
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import axios from 'axios';
 
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>,
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 function Cover() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [open, setOpen] = React.useState(false);
+  const [dialogTitle, setDialogTitle] = React.useState('');
+  const [dialogMessage, setDialogMessage] = React.useState('');
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleSignUp = (event) => {
     console.log(userName);
@@ -52,6 +82,9 @@ function Cover() {
         console.log('success');
       })
       .catch((error) => {
+        setDialogTitle(error.response.data.resultCode);
+        setDialogMessage(error.response.data.resultMessage);
+        setOpen(true);
         console.log(error);
       });
   };
@@ -96,7 +129,7 @@ function Cover() {
                     />
                   </MDBox>
                   <MDBox mt={4} mb={1}>
-                    <MDButton variant="gradient" color="info" fullWidth>
+                    <MDButton onClick={handleSignUp} variant="gradient" color="info" fullWidth>
                       sign up
                     </MDButton>
                   </MDBox>
@@ -117,6 +150,23 @@ function Cover() {
                   </MDBox>
                 </MDBox>
               </MDBox>
+              <Dialog
+                open={open}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={handleClose}
+                aria-describedby="alert-dialog-slide-description"
+              >
+                <DialogTitle>{dialogTitle}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-slide-description">
+                    {dialogMessage}
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleClose}>OK</Button>
+                </DialogActions>
+              </Dialog>
             </Card>
           </Grid>
         </Grid>
