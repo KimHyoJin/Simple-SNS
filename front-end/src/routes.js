@@ -38,7 +38,7 @@ Coded by www.creative-tim.com
 // Material Dashboard 2 React layouts
 import Feed from 'layouts/feed';
 import Post from 'layouts/post';
-import Notifications from 'layouts/notifications';
+import MyPosts from 'layouts/myposts';
 import SignIn from 'layouts/authentication/sign-in';
 import SignUp from 'layouts/authentication/sign-up';
 
@@ -62,13 +62,6 @@ const routes = [
   },
   {
     type: 'collapse',
-    name: 'Notifications',
-    key: 'notifications',
-    route: '/notifications',
-    component: <Notifications />,
-  },
-  {
-    type: 'collapse',
     name: 'Login',
     key: 'sign-in',
     route: '/authentication/sign-in',
@@ -81,6 +74,13 @@ const routes = [
     route: '/authentication/sign-up',
     component: <SignUp />,
   },
+  {
+      type: 'collapse',
+      name: 'MyPosts',
+      key: 'myposts',
+      route: '/my-post',
+      component: <MyPosts />,
+    },
 ];
 
 export default routes;

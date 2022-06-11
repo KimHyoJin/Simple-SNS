@@ -31,7 +31,7 @@ import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 
-function Notifications() {
+function MyPosts() {
   const [successSB, setSuccessSB] = useState(false);
   const [infoSB, setInfoSB] = useState(false);
   const [warningSB, setWarningSB] = useState(false);
@@ -115,7 +115,7 @@ function Notifications() {
       <MDBox mt={6} mb={3}>
         <Grid container spacing={3} justifyContent="center">
           <Grid item xs={12} lg={8}>
-            Notifications
+            MyPosts
           </Grid>
         </Grid>
       </MDBox>
@@ -123,4 +123,4 @@ function Notifications() {
   );
 }
 
-export default Notifications;
+export default MyPosts;
