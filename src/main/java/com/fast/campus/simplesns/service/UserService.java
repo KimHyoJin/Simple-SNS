@@ -5,7 +5,7 @@ import com.fast.campus.simplesns.exception.ErrorCode;
 import com.fast.campus.simplesns.exception.SimpleSnsApplicationException;
 import com.fast.campus.simplesns.model.User;
 import com.fast.campus.simplesns.model.entity.UserEntity;
-import com.fast.campus.simplesns.repository.UserRepository;
+import com.fast.campus.simplesns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserEntityRepository userRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
