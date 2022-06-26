@@ -31,29 +31,33 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (!header.startsWith("Bearer ")) {
+        if (header == null || !header.startsWith("Bearer ")) {
             log.warn("Authorization Header does not start with Bearer");
             chain.doFilter(request, response);
             return;
         }
 
-        final String token = header.split(" ")[1].trim();
-        User userDetails = userService.loadUserByUsername(JwtTokenUtils.getUsername(token, secretKey));
+        try {
+            final String token = header.split(" ")[1].trim();
+            String userName = JwtTokenUtils.getUsername(token, secretKey);
+            User userDetails = userService.loadUserByUsername(userName);
 
-        if (!JwtTokenUtils.validate(token, userDetails, secretKey)) {
+            if (!JwtTokenUtils.validate(token, userDetails, secretKey)) {
+                chain.doFilter(request, response);
+                return;
+            }
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null,
+                    userDetails.getAuthorities()
+            );
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (RuntimeException e) {
             chain.doFilter(request, response);
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null,
-                userDetails.getAuthorities()
-        );
-
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
-    }
 
+    }
 }

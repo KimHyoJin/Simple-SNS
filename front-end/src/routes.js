@@ -75,12 +75,12 @@ const routes = [
     component: <SignUp />,
   },
   {
-      type: 'collapse',
-      name: 'MyPosts',
-      key: 'myposts',
-      route: '/my-post',
-      component: <MyPosts />,
-    },
+    type: 'collapse',
+    name: 'MyPosts',
+    key: 'myposts',
+    route: '/my-post',
+    component: <MyPosts />,
+  },
 ];
 
 export default routes;

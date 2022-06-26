@@ -89,7 +89,8 @@ function Basic() {
       .then((res) => {
         console.log('success');
         const { accessToken } = res.data;
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        localStorage.setItem('token', res.data.result.token);
+        console.log(res.data.result.token);
       })
       .catch((error) => {
         setDialogTitle(error.response.data.resultCode);
