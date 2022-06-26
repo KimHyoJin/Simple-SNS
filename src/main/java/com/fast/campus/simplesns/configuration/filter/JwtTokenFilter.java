@@ -1,6 +1,6 @@
 package com.fast.campus.simplesns.configuration.filter;
 
-import com.fast.campus.simplesns.JwtTokenUtils;
+import com.fast.campus.simplesns.utils.JwtTokenUtils;
 import com.fast.campus.simplesns.model.User;
 import com.fast.campus.simplesns.service.UserService;
 import lombok.RequiredArgsConstructor;

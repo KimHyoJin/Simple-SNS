@@ -1,6 +1,6 @@
 package com.fast.campus.simplesns.service;
 
-import com.fast.campus.simplesns.JwtTokenUtils;
+import com.fast.campus.simplesns.utils.JwtTokenUtils;
 import com.fast.campus.simplesns.exception.ErrorCode;
 import com.fast.campus.simplesns.exception.SimpleSnsApplicationException;
 import com.fast.campus.simplesns.model.User;
