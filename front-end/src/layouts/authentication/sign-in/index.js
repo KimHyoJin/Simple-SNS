@@ -18,6 +18,7 @@ import * as React from 'react';
 
 // react-router-dom components
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router";
 
 // @mui material components
 import Card from '@mui/material/Card';
@@ -65,6 +66,13 @@ function Basic() {
   const [open, setOpen] = React.useState(false);
   const [dialogTitle, setDialogTitle] = React.useState('');
   const [dialogMessage, setDialogMessage] = React.useState('');
+  const navigate = useNavigate();
+
+  const logout = () => {
+    console.log(localStorage.getItem('token'))
+    localStorage.setItem('token', "");
+    navigate("/feed");
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -88,6 +96,8 @@ function Basic() {
     })
       .then((res) => {
         console.log('success');
+        setDialogTitle('success');
+        setOpen(true);
         const { accessToken } = res.data;
         localStorage.setItem('token', res.data.result.token);
         console.log(res.data.result.token);
@@ -100,90 +110,146 @@ function Basic() {
       });
   };
 
-  return (
-    <DashboardLayout>
-      <MDBox mt={30} mb={3}>
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} lg={8}>
-            <Card>
-              <MDBox
-                variant="gradient"
-                bgColor="info"
-                borderRadius="lg"
-                coloredShadow="info"
-                mx={2}
-                mt={-3}
-                p={2}
-                mb={1}
-                textAlign="center"
-              >
-                <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-                  Sign in
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={4} pb={3} px={3}>
-                <MDBox component="form" role="form">
-                  <MDBox mb={2}>
-                    <MDInput
-                      type="userName"
-                      label="User Name"
-                      onChange={(v) => setUserName(v.target.value)}
-                      fullWidth
-                    />
-                  </MDBox>
-                  <MDBox mb={2}>
-                    <MDInput
-                      type="password"
-                      label="Password"
-                      onChange={(v) => setPassword(v.target.value)}
-                      fullWidth
-                    />
-                  </MDBox>
-                  <MDBox mt={4} mb={1}>
-                    <MDButton onClick={handleSignIn} variant="gradient" color="info" fullWidth>
-                      sign in
-                    </MDButton>
-                  </MDBox>
-                  <MDBox mt={3} mb={1} textAlign="center">
-                    <MDTypography variant="button" color="text">
-                      Don&apos;t have an account?{' '}
-                      <MDTypography
-                        component={Link}
-                        to="/authentication/sign-up"
-                        variant="button"
-                        color="info"
-                        fontWeight="medium"
-                        textGradient
-                      >
-                        Sign Up
+  if (localStorage.getItem('token') == "") {
+    return (
+      <DashboardLayout>
+        <MDBox mt={30} mb={3}>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} lg={8}>
+              <Card>
+                <MDBox
+                  variant="gradient"
+                  bgColor="info"
+                  borderRadius="lg"
+                  coloredShadow="info"
+                  mx={2}
+                  mt={-3}
+                  p={2}
+                  mb={1}
+                  textAlign="center"
+                >
+                  <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+                    Sign in
+                  </MDTypography>
+                </MDBox>
+                <MDBox pt={4} pb={3} px={3}>
+                  <MDBox component="form" role="form">
+                    <MDBox mb={2}>
+                      <MDInput
+                        type="userName"
+                        label="User Name"
+                        onChange={(v) => setUserName(v.target.value)}
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mb={2}>
+                      <MDInput
+                        type="password"
+                        label="Password"
+                        onChange={(v) => setPassword(v.target.value)}
+                        fullWidth
+                      />
+                    </MDBox>
+                    <MDBox mt={4} mb={1}>
+                      <MDButton onClick={handleSignIn} variant="gradient" color="info" fullWidth>
+                        sign in
+                      </MDButton>
+                    </MDBox>
+                    <MDBox mt={3} mb={1} textAlign="center">
+                      <MDTypography variant="button" color="text">
+                        Don&apos;t have an account?{' '}
+                        <MDTypography
+                          component={Link}
+                          to="/authentication/sign-up"
+                          variant="button"
+                          color="info"
+                          fontWeight="medium"
+                          textGradient
+                        >
+                          Sign Up
+                        </MDTypography>
                       </MDTypography>
-                    </MDTypography>
+                    </MDBox>
                   </MDBox>
                 </MDBox>
-              </MDBox>
-              <Dialog
-                open={open}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={handleClose}
-                aria-describedby="alert-dialog-slide-description"
-              >
-                <DialogTitle>{dialogTitle}</DialogTitle>
-                <DialogContent>
-                  <DialogContentText id="alert-dialog-slide-description">
-                    {dialogMessage}
-                  </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleClose}>OK</Button>
-                </DialogActions>
-              </Dialog>
-            </Card>
+                <Dialog
+                  open={open}
+                  TransitionComponent={Transition}
+                  keepMounted
+                  onClose={handleClose}
+                  aria-describedby="alert-dialog-slide-description"
+                >
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                      {dialogMessage}
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>OK</Button>
+                  </DialogActions>
+                </Dialog>
+              </Card>
+            </Grid>
           </Grid>
-        </Grid>
-      </MDBox>
-    </DashboardLayout>
-  );
+        </MDBox>
+      </DashboardLayout>
+    );
+  } else {
+    return (
+      <DashboardLayout>
+        <MDBox mt={30} mb={3}>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} lg={8}>
+              <Card>
+                <MDBox
+                  variant="gradient"
+                  bgColor="info"
+                  borderRadius="lg"
+                  coloredShadow="info"
+                  mx={2}
+                  mt={-3}
+                  p={2}
+                  mb={1}
+                  textAlign="center"
+                >
+                  <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+                    Already login
+                  </MDTypography>
+                </MDBox>
+                <MDBox pt={4} pb={3} px={3}>
+                  <MDBox component="form" role="form">
+                    <MDBox mt={4} mb={1}>
+                      <MDButton onClick={logout} variant="gradient" color="info" fullWidth>
+                        logout
+                      </MDButton>
+                    </MDBox>
+                  </MDBox>
+                </MDBox>
+                <Dialog
+                  open={open}
+                  TransitionComponent={Transition}
+                  keepMounted
+                  onClose={handleClose}
+                  aria-describedby="alert-dialog-slide-description"
+                >
+                  <DialogTitle>{dialogTitle}</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                      {dialogMessage}
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>OK</Button>
+                  </DialogActions>
+                </Dialog>
+              </Card>
+            </Grid>
+          </Grid>
+        </MDBox>
+      </DashboardLayout>
+    );
+  }
 }
 
 export default Basic;

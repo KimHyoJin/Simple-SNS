@@ -27,6 +27,7 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${jwt.secret-key}")
     private String secretKey;
 
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(encoder);

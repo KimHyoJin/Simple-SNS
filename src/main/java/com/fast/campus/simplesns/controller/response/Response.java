@@ -19,6 +19,13 @@ public class Response<T> {
     }
 
     public String toStream() {
+        if (result == null) {
+            return "{" +
+                    "\"resultCode\":" + "\"" + resultCode + "\"," +
+                    "\"resultMessage\":" + "\"" + resultMessage + "\"," +
+                    "\"result\":" + result +
+                    "}";
+        }
         return "{" +
                 "\"resultCode\":" + "\"" + resultCode + "\"," +
                 "\"resultMessage\":" + "\"" + resultMessage + "\"," +

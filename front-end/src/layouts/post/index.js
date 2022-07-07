@@ -13,6 +13,7 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
+import * as React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -31,11 +32,27 @@ import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
 import DataTable from 'examples/Tables/DataTable';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
 
 // Data
 import authorsTableData from 'layouts/post/data/authorsTableData';
 import projectsTableData from 'layouts/post/data/projectsTableData';
 import axios from 'axios';
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>,
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 function Post() {
   const { columns, rows } = authorsTableData();
@@ -43,17 +60,28 @@ function Post() {
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [open, setOpen] = React.useState(false);
+  const [dialogTitle, setDialogTitle] = React.useState('');
+  const [dialogMessage, setDialogMessage] = React.useState('');
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleWritePost = (event) => {
     console.log(localStorage.getItem('token'));
-    console.log("title : " + title);
-    console.log("body : " + body);
+    console.log('title : ' + title);
+    console.log('body : ' + body);
 
     axios({
       url: '/api/v1/posts',
       method: 'POST',
       headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('token')
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
       },
       data: {
         title: title,
@@ -61,9 +89,15 @@ function Post() {
       },
     })
       .then((res) => {
+        setDialogTitle('success');
+        setOpen(true);
         console.log('success');
       })
       .catch((error) => {
+        setDialogTitle(error.response.data.resultCode);
+        setDialogMessage(error.response.data.resultMessage);
+        setOpen(true);
+
         console.log(error);
       });
   };
@@ -75,16 +109,13 @@ function Post() {
           <MDBox pt={4} pb={3} px={3}>
             <MDBox component="form" role="form">
               <MDBox mb={2}>
-                <MDInput
-                  label="Title"
-                  onChange={(v) => setTitle(v.target.value)}
-                  fullWidth
-                />
+                <MDInput label="Title" onChange={(v) => setTitle(v.target.value)} fullWidth />
               </MDBox>
               <MDBox mb={2}>
                 <MDInput
                   label="Body"
-                  multiline rows={20}
+                  multiline
+                  rows={20}
                   onChange={(v) => setBody(v.target.value)}
                   fullWidth
                 />
@@ -96,6 +127,23 @@ function Post() {
               </MDBox>
             </MDBox>
           </MDBox>
+          <Dialog
+            open={open}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={handleClose}
+            aria-describedby="alert-dialog-slide-description"
+          >
+            <DialogTitle>{dialogTitle}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-slide-description">
+                {dialogMessage}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>OK</Button>
+            </DialogActions>
+          </Dialog>
         </Card>
       </MDBox>
     </DashboardLayout>

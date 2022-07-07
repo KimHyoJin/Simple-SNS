@@ -79,6 +79,8 @@ function Cover() {
       },
     })
       .then((res) => {
+        setDialogTitle('success');
+        setOpen(true);
         console.log('success');
       })
       .catch((error) => {
