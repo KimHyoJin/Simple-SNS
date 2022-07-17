@@ -13,112 +13,194 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 // @mui material components
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 // Material Dashboard 2 React components
 import MDBox from 'components/MDBox';
 import MDTypography from 'components/MDTypography';
-import MDAlert from 'components/MDAlert';
+import MDInput from 'components/MDInput';
 import MDButton from 'components/MDButton';
-import MDSnackbar from 'components/MDSnackbar';
+import MDPagination from 'components/MDPagination';
 
 // Material Dashboard 2 React example components
 import DashboardLayout from 'examples/LayoutContainers/DashboardLayout';
 import DashboardNavbar from 'examples/Navbars/DashboardNavbar';
 import Footer from 'examples/Footer';
+import DataTable from 'examples/Tables/DataTable';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+
+// Data
+import axios from 'axios';
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>,
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 function MyPosts() {
-  const [successSB, setSuccessSB] = useState(false);
-  const [infoSB, setInfoSB] = useState(false);
-  const [warningSB, setWarningSB] = useState(false);
-  const [errorSB, setErrorSB] = useState(false);
+  const [page, setPage] = useState(0);
+  const [render, setRender] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [totalPage, setTotalPage] = useState(0);
 
-  const openSuccessSB = () => setSuccessSB(true);
-  const closeSuccessSB = () => setSuccessSB(false);
-  const openInfoSB = () => setInfoSB(true);
-  const closeInfoSB = () => setInfoSB(false);
-  const openWarningSB = () => setWarningSB(true);
-  const closeWarningSB = () => setWarningSB(false);
-  const openErrorSB = () => setErrorSB(true);
-  const closeErrorSB = () => setErrorSB(false);
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [open, setOpen] = React.useState(false);
+  const [dialogTitle, setDialogTitle] = React.useState('');
+  const [dialogMessage, setDialogMessage] = React.useState('');
+  const navigate = useNavigate();
 
-  const alertContent = (name) => (
-    <MDTypography variant="body2" color="white">
-      A simple {name} alert with{' '}
-      <MDTypography component="a" href="#" variant="body2" fontWeight="medium" color="white">
-        an example link
-      </MDTypography>
-      . Give it a click if you like.
-    </MDTypography>
-  );
+  const handleModify = (post) => {
+    console.log('handleModify');
+    console.log(post);
+    navigate('/modify-post', { state: post });
+  };
 
-  const renderSuccessSB = (
-    <MDSnackbar
-      color="success"
-      icon="check"
-      title="Material Dashboard"
-      content="Hello, world! This is a notification message"
-      dateTime="11 mins ago"
-      open={successSB}
-      onClose={closeSuccessSB}
-      close={closeSuccessSB}
-      bgWhite
-    />
-  );
+  const handleDelete = (id) => {
+    console.log('handleDelete ' + id);
+    axios({
+      url: '/api/v1/posts/' + id,
+      method: 'DELETE',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+    })
+      .then((res) => {
+        console.log('success');
+        console.log(res);
+        console.log(page);
+        handleGetPosts(page);
+      })
+      .catch((error) => {
+        console.log(error);
+        navigate('/authentication/sign-in');
+      });
+  };
 
-  const renderInfoSB = (
-    <MDSnackbar
-      icon="notifications"
-      title="Material Dashboard"
-      content="Hello, world! This is a notification message"
-      dateTime="11 mins ago"
-      open={infoSB}
-      onClose={closeInfoSB}
-      close={closeInfoSB}
-    />
-  );
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-  const renderWarningSB = (
-    <MDSnackbar
-      color="warning"
-      icon="star"
-      title="Material Dashboard"
-      content="Hello, world! This is a notification message"
-      dateTime="11 mins ago"
-      open={warningSB}
-      onClose={closeWarningSB}
-      close={closeWarningSB}
-      bgWhite
-    />
-  );
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-  const renderErrorSB = (
-    <MDSnackbar
-      color="error"
-      icon="warning"
-      title="Material Dashboard"
-      content="Hello, world! This is a notification message"
-      dateTime="11 mins ago"
-      open={errorSB}
-      onClose={closeErrorSB}
-      close={closeErrorSB}
-      bgWhite
-    />
-  );
+  const changePage = (pageNum) => {
+    console.log('changePage');
+    setPage(pageNum);
+    handleGetPosts(pageNum);
+  };
+
+  const handleGetPosts = (pageNum, event) => {
+    console.log('handleGetPosts');
+    axios({
+      url: '/api/v1/posts/my?size=5&sort=id&page=' + pageNum,
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token'),
+      },
+    })
+      .then((res) => {
+        console.log('success');
+        console.log(res);
+        setPosts(res.data.result.content);
+        setTotalPage(res.data.result.totalPages);
+      })
+      .catch((error) => {
+        console.log(error);
+        navigate('/authentication/sign-in');
+      });
+  };
+
+  useEffect(() => {
+    handleGetPosts(0);
+  }, []);
 
   return (
     <DashboardLayout>
-      <MDBox mt={6} mb={3}>
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} lg={8}>
-            MyPosts
-          </Grid>
-        </Grid>
+      <MDBox pt={3} pb={3}>
+        {posts.map((post) => (
+          <MDBox pt={2} pb={2} px={3}>
+            <Card>
+              <MDBox pt={2} pb={2} px={3}>
+                <Grid container>
+                  <Grid item xs={6}>
+                    <MDTypography fontWeight="bold" variant="body2">
+                      {post.title}
+                    </MDTypography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <MDTypography variant="body2" textAlign="right">
+                      {post.user.name}
+                    </MDTypography>
+                  </Grid>
+                </Grid>
+                <MDTypography variant="body2">{post.body}</MDTypography>
+                <Grid container>
+                  <Grid item xs={10}></Grid>
+                  <Grid item xs={1}>
+                    <Button onClick={() => handleModify(post)}>Modify</Button>
+                  </Grid>
+                  <Grid item xs={1}>
+                    <Button onClick={() => handleDelete(post.id)}>Delete</Button>
+                  </Grid>
+                </Grid>
+              </MDBox>
+            </Card>
+          </MDBox>
+        ))}
+
+        <Dialog
+          open={open}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={handleClose}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-slide-description">
+              {dialogMessage}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>OK</Button>
+          </DialogActions>
+        </Dialog>
       </MDBox>
+
+      <MDPagination>
+        <MDPagination item>
+          <KeyboardArrowLeftIcon></KeyboardArrowLeftIcon>
+        </MDPagination>
+        {[...Array(totalPage).keys()].map((i) => (
+          <MDPagination item onClick={() => changePage(i)}>
+            {i + 1}
+          </MDPagination>
+        ))}
+        <MDPagination item>
+          <KeyboardArrowRightIcon></KeyboardArrowRightIcon>
+        </MDPagination>
+      </MDPagination>
     </DashboardLayout>
   );
 }

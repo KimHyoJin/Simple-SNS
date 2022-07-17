@@ -15,7 +15,7 @@ Coded by www.creative-tim.com
 
 import * as React from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 // @mui material components
 import Grid from '@mui/material/Grid';
@@ -51,9 +51,14 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function Post() {
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
+
+
+function ModifyPost() {
+  const { state } = useLocation();
+  console.log(state)
+  const [title, setTitle] = useState(state.title);
+  const [body, setBody] = useState(state.body);
+  const [id, setId] = useState(state.id);
   const [open, setOpen] = React.useState(false);
   const [dialogTitle, setDialogTitle] = React.useState('');
   const [dialogMessage, setDialogMessage] = React.useState('');
@@ -66,14 +71,15 @@ function Post() {
     setOpen(false);
   };
 
-  const handleWritePost = (event) => {
+  const handleModifyPost = (event) => {
     console.log(localStorage.getItem('token'));
     console.log('title : ' + title);
     console.log('body : ' + body);
+    console.log('id : ' + id);
 
     axios({
-      url: '/api/v1/posts',
-      method: 'POST',
+      url: '/api/v1/posts/' + id,
+      method: 'PUT',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
       },
@@ -103,11 +109,12 @@ function Post() {
           <MDBox pt={4} pb={3} px={3}>
             <MDBox component="form" role="form">
               <MDBox mb={2}>
-                <MDInput label="Title" onChange={(v) => setTitle(v.target.value)} fullWidth />
+                <MDInput label="Title" defaultValue={title} onChange={(v) => setTitle(v.target.value)} fullWidth />
               </MDBox>
               <MDBox mb={2}>
                 <MDInput
                   label="Body"
+                  defaultValue={body}
                   multiline
                   rows={20}
                   onChange={(v) => setBody(v.target.value)}
@@ -115,8 +122,8 @@ function Post() {
                 />
               </MDBox>
               <MDBox mt={4} mb={1} right>
-                <MDButton onClick={handleWritePost} variant="gradient" color="info">
-                  Save
+                <MDButton onClick={handleModifyPost} variant="gradient" color="info">
+                  Update
                 </MDButton>
               </MDBox>
             </MDBox>
@@ -144,4 +151,4 @@ function Post() {
   );
 }
 
-export default Post;
+export default ModifyPost;

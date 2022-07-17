@@ -18,7 +18,7 @@ import * as React from 'react';
 
 // react-router-dom components
 import { Link } from 'react-router-dom';
-import { useNavigate } from "react-router";
+import { useNavigate } from 'react-router';
 
 // @mui material components
 import Card from '@mui/material/Card';
@@ -69,9 +69,9 @@ function Basic() {
   const navigate = useNavigate();
 
   const logout = () => {
-    console.log(localStorage.getItem('token'))
-    localStorage.setItem('token', "");
-    navigate("/feed");
+    console.log(localStorage.getItem('token'));
+    localStorage.setItem('token', '');
+    navigate('/feed');
   };
 
   const handleClickOpen = () => {
@@ -97,8 +97,8 @@ function Basic() {
       .then((res) => {
         console.log('success');
         setDialogTitle('success');
+        setDialogMessage('');
         setOpen(true);
-        const { accessToken } = res.data;
         localStorage.setItem('token', res.data.result.token);
         console.log(res.data.result.token);
       })
@@ -110,7 +110,7 @@ function Basic() {
       });
   };
 
-  if (localStorage.getItem('token') == "") {
+  if (localStorage.getItem('token') == '') {
     return (
       <DashboardLayout>
         <MDBox mt={30} mb={3}>

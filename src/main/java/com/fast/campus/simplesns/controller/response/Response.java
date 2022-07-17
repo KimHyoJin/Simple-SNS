@@ -10,6 +10,10 @@ public class Response<T> {
     private String resultMessage;
     private T result;
 
+    public static <T> Response<T> success() {
+        return new Response<T>("SUCCESS", null, null);
+    }
+
     public static <T> Response<T> success(T result) {
         return new Response<T>("SUCCESS", null, result);
     }
@@ -23,7 +27,7 @@ public class Response<T> {
             return "{" +
                     "\"resultCode\":" + "\"" + resultCode + "\"," +
                     "\"resultMessage\":" + "\"" + resultMessage + "\"," +
-                    "\"result\":" + result +
+                    "\"result\":" + null +
                     "}";
         }
         return "{" +
