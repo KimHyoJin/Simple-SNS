@@ -3,6 +3,7 @@ package com.fast.campus.simplesns.controller;
 import com.fast.campus.simplesns.controller.request.PostModifyRequest;
 import com.fast.campus.simplesns.controller.request.PostWriteRequest;
 import com.fast.campus.simplesns.exception.ErrorCode;
+import com.fast.campus.simplesns.exception.SimpleSnsApplicationException;
 import com.fast.campus.simplesns.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -10,11 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,6 +72,7 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void 포스트수정시_본인이_작성한_글이_아니라면_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).modify(any(), eq(1), eq("title"), eq("body"));
         mockMvc.perform(put("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(new PostModifyRequest("title", "body"))))
@@ -76,16 +83,18 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void 포스트수정시_수정하려는글이_없다면_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).modify(any(), eq(1), eq("title"), eq("body"));
         mockMvc.perform(put("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(new PostModifyRequest("title", "body"))))
                 .andDo(print())
-                .andExpect(status().is(ErrorCode.INVALID_PERMISSION.getStatus().value()));
+                .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()));
     }
 
     @Test
     @WithMockUser
     void 포스트수정시_데이터베이스_에러_발생시_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.DATABASE_ERROR)).when(postService).modify(any(), eq(1), eq("title"), eq("body"));
         mockMvc.perform(put("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(new PostModifyRequest("title", "body"))))
@@ -105,7 +114,9 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void 포스트삭제시_본인이_작성한_글이_아니라면_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION)).when(postService).delete(any(), eq(1));
         mockMvc.perform(delete("/api/v1/posts/1")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is(ErrorCode.INVALID_PERMISSION.getStatus().value()));
@@ -114,15 +125,19 @@ public class PostControllerTest {
     @Test
     @WithMockUser
     void 포스트삭제시_수정하려는글이_없다면_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).delete(any(), eq(1));
+
         mockMvc.perform(delete("/api/v1/posts/1")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().is(ErrorCode.INVALID_PERMISSION.getStatus().value()));
+                .andExpect(status().is(ErrorCode.POST_NOT_FOUND.getStatus().value()));
     }
 
     @Test
     @WithMockUser
     void 포스트삭제시_데이터베이스_에러_발생시_에러발생() throws Exception {
+        doThrow(new SimpleSnsApplicationException(ErrorCode.DATABASE_ERROR)).when(postService).delete(any(), eq(1));
         mockMvc.perform(delete("/api/v1/posts/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
