@@ -7,32 +7,29 @@ import lombok.Getter;
 @AllArgsConstructor
 public class Response<T> {
     private String resultCode;
-    private String resultMessage;
     private T result;
 
     public static <T> Response<T> success() {
-        return new Response<T>("SUCCESS", null, null);
+        return new Response<T>("SUCCESS", null);
     }
 
     public static <T> Response<T> success(T result) {
-        return new Response<T>("SUCCESS", null, result);
+        return new Response<T>("SUCCESS", result);
     }
 
-    public static Response<Void> error(String resultCode, String resultMessage) {
-        return new Response<Void>(resultCode, resultMessage, null);
+    public static Response<Void> error(String resultCode) {
+        return new Response<Void>(resultCode, null);
     }
 
     public String toStream() {
         if (result == null) {
             return "{" +
                     "\"resultCode\":" + "\"" + resultCode + "\"," +
-                    "\"resultMessage\":" + "\"" + resultMessage + "\"," +
                     "\"result\":" + null +
                     "}";
         }
         return "{" +
                 "\"resultCode\":" + "\"" + resultCode + "\"," +
-                "\"resultMessage\":" + "\"" + resultMessage + "\"," +
                 "\"result\":" + "\"" + result + "\"," +
                 "}";
     }

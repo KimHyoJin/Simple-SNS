@@ -43,10 +43,6 @@ public class JwtTokenUtils {
         return doGenerateToken(username, expiredTimeMs, key);
     }
 
-    public static String generateRefreshToken(String username, String key, long expiredTimeMs) {
-        return doGenerateToken(username, expiredTimeMs, key);
-    }
-
     private static String doGenerateToken(String username, long expireTime, String key) { // 1
         Claims claims = Jwts.claims();
         claims.put("username", username);
@@ -58,11 +54,4 @@ public class JwtTokenUtils {
                 .signWith(getSigningKey(key), SignatureAlgorithm.HS256)
                 .compact();
     }
-
-
-    public static long getRemainMilliSeconds(String token, String key) {
-        Date expiration = extractAllClaims(token, key).getExpiration();
-        return expiration.getTime() - new Date().getTime();
-    }
-
 }
