@@ -1,21 +1,20 @@
 package com.fast.campus.simplesns.service;
 
-import com.fast.campus.simplesns.utils.JwtTokenUtils;
 import com.fast.campus.simplesns.exception.ErrorCode;
 import com.fast.campus.simplesns.exception.SimpleSnsApplicationException;
 import com.fast.campus.simplesns.model.User;
 import com.fast.campus.simplesns.model.entity.UserEntity;
 import com.fast.campus.simplesns.repository.UserEntityRepository;
+import com.fast.campus.simplesns.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserEntityRepository userRepository;
     private final BCryptPasswordEncoder encoder;
@@ -27,7 +26,6 @@ public class UserService implements UserDetailsService {
     private Long expiredTimeMs;
 
 
-    @Override
     public User loadUserByUsername(String userName) throws UsernameNotFoundException {
         return userRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(
                 () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))

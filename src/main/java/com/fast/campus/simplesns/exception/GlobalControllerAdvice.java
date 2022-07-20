@@ -14,14 +14,14 @@ public class GlobalControllerAdvice {
 
     @ExceptionHandler(SimpleSnsApplicationException.class)
     public ResponseEntity<?> errorHandler(SimpleSnsApplicationException e) {
-        log.error("Error occurs %s", e);
+        log.error("Error occurs {}", e.toString());
         return ResponseEntity.status(e.getErrorCode().getStatus())
                 .body(Response.error(e.getErrorCode().name()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> databaseErrorHandler(IllegalArgumentException e) {
-        log.error("Error occurs %s", e);
+        log.error("Error occurs {}", e.toString());
         return ResponseEntity.status(DATABASE_ERROR.getStatus())
                 .body(Response.error(DATABASE_ERROR.name()));
     }
