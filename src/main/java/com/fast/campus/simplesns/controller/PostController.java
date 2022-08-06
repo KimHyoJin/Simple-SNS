@@ -1,5 +1,6 @@
 package com.fast.campus.simplesns.controller;
 
+import com.fast.campus.simplesns.controller.request.PostCommentRequest;
 import com.fast.campus.simplesns.controller.request.PostModifyRequest;
 import com.fast.campus.simplesns.controller.request.PostWriteRequest;
 import com.fast.campus.simplesns.controller.response.PostResponse;
@@ -44,6 +45,18 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public Response<Void> delete(@PathVariable Integer postId, Authentication authentication) {
         postService.delete(authentication.getName(), postId);
+        return Response.success();
+    }
+
+    @PostMapping("/{postId}/comments")
+    public Response<Void> comment(@PathVariable Integer postId, @RequestBody PostCommentRequest request, Authentication authentication) {
+        postService.comment(postId, authentication.getName(), request.getComment());
+        return Response.success();
+    }
+
+    @PostMapping("/{postId}/likes")
+    public Response<Void> like(@PathVariable Integer postId, Authentication authentication) {
+        postService.like(postId, authentication.getName());
         return Response.success();
     }
 }

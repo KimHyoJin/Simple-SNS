@@ -1,46 +1,45 @@
 package com.fast.campus.simplesns.model.entity;
 
+import com.fast.campus.simplesns.model.AlarmArgs;
+import com.fast.campus.simplesns.model.AlarmType;
+import com.fast.campus.simplesns.repository.converter.AlarmArgsConverter;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 
 @Setter
 @Getter
 @Entity
-@Table(name = "\"post\"")
-@SQLDelete(sql = "UPDATE \"post\" SET removed_at = NOW() WHERE id=?")
+@Table(name = "\"alarm\"")
+@SQLDelete(sql = "UPDATE \"alarm\" SET removed_at = NOW() WHERE id=?")
 @Where(clause = "removed_at is NULL")
 @NoArgsConstructor
-public class PostEntity {
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+public class AlarmEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id = null;
 
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "body", columnDefinition = "TEXT")
-    private String body;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany
-    @JoinColumn(name = "post_id")
-    private List<CommentEntity> comments;
+    @Enumerated(EnumType.STRING)
+    private AlarmType alarmType;
 
-    @OneToMany
-    @JoinColumn(name = "post_id")
-    private List<LikeEntity> likes;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "json")
+    private AlarmArgs args;
 
     @Column(name = "registered_at")
     private Timestamp registeredAt;
@@ -62,10 +61,10 @@ public class PostEntity {
         this.updatedAt = Timestamp.from(Instant.now());
     }
 
-    public static PostEntity of(String title, String body, UserEntity user) {
-        PostEntity entity = new PostEntity();
-        entity.setTitle(title);
-        entity.setBody(body);
+    public static AlarmEntity of(AlarmType alarmType, AlarmArgs args, UserEntity user) {
+        AlarmEntity entity = new AlarmEntity();
+        entity.setAlarmType(alarmType);
+        entity.setArgs(args);
         entity.setUser(user);
         return entity;
     }

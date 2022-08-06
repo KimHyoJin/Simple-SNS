@@ -1,5 +1,6 @@
 package com.fast.campus.simplesns.configuration;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 
@@ -32,14 +34,14 @@ public class WebConfiguration implements WebMvcConfigurer {
         private static final String REACT_STATIC_DIR = "static";
 
         private Resource index = new ClassPathResource(REACT_DIR + "index.html");
-        private List<String> rootStaticFiles = Arrays.asList("favicon.io",
-                "asset-manifest.json", "manifest.json", "service-worker.js");
+        private List<String> staticExtension = Arrays.asList("png", "jpg", "io", "json", "js", "html");
 
-        private Resource resolve(String requestPath, List<? extends Resource> locations) {
+        private Resource resolve(String requestPath) {
+            log.info(requestPath);
             if (requestPath == null) {
                 return null;
             }
-            if (rootStaticFiles.contains(requestPath)
+            if (staticExtension.contains(requestPath)
                     || requestPath.startsWith(REACT_STATIC_DIR)) {
                 return new ClassPathResource(REACT_DIR + requestPath);
             } else {
@@ -49,12 +51,12 @@ public class WebConfiguration implements WebMvcConfigurer {
 
         @Override
         public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations, ResourceResolverChain chain) {
-            return resolve(requestPath, locations);
+            return resolve(requestPath);
         }
 
         @Override
         public String resolveUrlPath(String resourcePath, List<? extends Resource> locations, ResourceResolverChain chain) {
-            Resource resolvedResource = resolve(resourcePath, locations);
+            Resource resolvedResource = resolve(resourcePath);
             if (resolvedResource == null) {
                 return null;
             }

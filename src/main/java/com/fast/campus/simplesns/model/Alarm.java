@@ -1,26 +1,27 @@
 package com.fast.campus.simplesns.model;
 
+import com.fast.campus.simplesns.model.entity.AlarmEntity;
 import com.fast.campus.simplesns.model.entity.PostEntity;
+import com.fast.campus.simplesns.model.entity.UserEntity;
+import com.fast.campus.simplesns.repository.converter.AlarmArgsConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public class Post {
+public class Alarm {
     private Integer id = null;
-
-    private String title;
-
-    private String body;
 
     private User user;
 
-    private List<Comment> comments;
-    private List<Like> likes;
+    private AlarmType alarmType;
+
+    private AlarmArgs args;
 
     private Timestamp registeredAt;
 
@@ -28,14 +29,16 @@ public class Post {
 
     private Timestamp removedAt;
 
-    public static Post fromEntity(PostEntity entity) {
-        return new Post(
+    public String getAlarmText() {
+        return alarmType.getAlarmText();
+    }
+
+    public static Alarm fromEntity(AlarmEntity entity) {
+        return new Alarm(
                 entity.getId(),
-                entity.getTitle(),
-                entity.getBody(),
                 User.fromEntity(entity.getUser()),
-                entity.getComments().stream().map(Comment::fromEntity).collect(Collectors.toList()),
-                entity.getLikes().stream().map(Like::fromEntity).collect(Collectors.toList()),
+                entity.getAlarmType(),
+                entity.getArgs(),
                 entity.getRegisteredAt(),
                 entity.getUpdatedAt(),
                 entity.getRemovedAt()
