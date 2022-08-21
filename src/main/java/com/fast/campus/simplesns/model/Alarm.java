@@ -1,16 +1,10 @@
 package com.fast.campus.simplesns.model;
 
 import com.fast.campus.simplesns.model.entity.AlarmEntity;
-import com.fast.campus.simplesns.model.entity.PostEntity;
-import com.fast.campus.simplesns.model.entity.UserEntity;
-import com.fast.campus.simplesns.repository.converter.AlarmArgsConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor

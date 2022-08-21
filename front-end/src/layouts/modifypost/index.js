@@ -51,11 +51,9 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
-
 function ModifyPost() {
   const { state } = useLocation();
-  console.log(state)
+  console.log(state);
   const [title, setTitle] = useState(state.title);
   const [body, setBody] = useState(state.body);
   const [id, setId] = useState(state.id);
@@ -109,7 +107,12 @@ function ModifyPost() {
           <MDBox pt={4} pb={3} px={3}>
             <MDBox component="form" role="form">
               <MDBox mb={2}>
-                <MDInput label="Title" defaultValue={title} onChange={(v) => setTitle(v.target.value)} fullWidth />
+                <MDInput
+                  label="Title"
+                  defaultValue={title}
+                  onChange={(v) => setTitle(v.target.value)}
+                  fullWidth
+                />
               </MDBox>
               <MDBox mb={2}>
                 <MDInput

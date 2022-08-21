@@ -2,7 +2,6 @@ package com.fast.campus.simplesns.model.entity;
 
 import com.fast.campus.simplesns.model.AlarmArgs;
 import com.fast.campus.simplesns.model.AlarmType;
-import com.fast.campus.simplesns.repository.converter.AlarmArgsConverter;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

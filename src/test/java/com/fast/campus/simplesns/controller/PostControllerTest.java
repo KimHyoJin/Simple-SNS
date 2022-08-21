@@ -191,5 +191,5 @@ public class PostControllerTest {
                 ).andDo(print())
                 .andExpect(status().isUnauthorized());
     }
-    
+
 }

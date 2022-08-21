@@ -56,70 +56,26 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function MyPosts() {
+function Alarm() {
   const [page, setPage] = useState(0);
   const [render, setRender] = useState(false);
-  const [posts, setPosts] = useState([]);
+  const [alarms, setAlarms] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
 
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [open, setOpen] = React.useState(false);
-  const [dialogTitle, setDialogTitle] = React.useState('');
-  const [dialogMessage, setDialogMessage] = React.useState('');
   const navigate = useNavigate();
 
-  const handleModify = (post) => {
-    console.log('handleModify');
-    console.log(post);
-    navigate('/modify-post', { state: post });
-  };
-
-  const handleDetail = (post) => {
-    console.log('handleDetail');
-    console.log(post);
-    navigate('/post-detail', { state: post });
-  };
-
-  const handleDelete = (id) => {
-    console.log('handleDelete ' + id);
-    axios({
-      url: '/api/v1/posts/' + id,
-      method: 'DELETE',
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
-      },
-    })
-      .then((res) => {
-        console.log('success');
-        console.log(res);
-        console.log(page);
-        handleGetPosts(page);
-      })
-      .catch((error) => {
-        console.log(error);
-        navigate('/authentication/sign-in');
-      });
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const changePage = (pageNum) => {
-    console.log('changePage');
+    console.log('change pages');
+    console.log(pageNum);
+    console.log(page);
     setPage(pageNum);
-    handleGetPosts(pageNum);
+    handleGetAlarm(pageNum);
   };
 
-  const handleGetPosts = (pageNum, event) => {
-    console.log('handleGetPosts');
+  const handleGetAlarm = (pageNum, event) => {
+    console.log('handleGetAlarm');
     axios({
-      url: '/api/v1/posts/my?size=5&sort=id&page=' + pageNum,
+      url: '/api/v1/users/alarm?size=5&sort=id&page=' + pageNum,
       method: 'GET',
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token'),
@@ -128,7 +84,7 @@ function MyPosts() {
       .then((res) => {
         console.log('success');
         console.log(res);
-        setPosts(res.data.result.content);
+        setAlarms(res.data.result.content);
         setTotalPage(res.data.result.totalPages);
       })
       .catch((error) => {
@@ -138,63 +94,27 @@ function MyPosts() {
   };
 
   useEffect(() => {
-    handleGetPosts(0);
+    handleGetAlarm();
   }, []);
 
   return (
     <DashboardLayout>
       <MDBox pt={3} pb={3}>
-        {posts.map((post) => (
+        {alarms.map((alarm) => (
           <MDBox pt={2} pb={2} px={3}>
             <Card>
               <MDBox pt={2} pb={2} px={3}>
                 <Grid container>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <MDTypography fontWeight="bold" variant="body2">
-                      {post.title}
+                      {alarm.text}
                     </MDTypography>
                   </Grid>
-                  <Grid item xs={6}>
-                    <MDTypography variant="body2" textAlign="right">
-                      {post.user.name}
-                    </MDTypography>
                   </Grid>
-                </Grid>
-                <MDTypography variant="body2">{post.body}</MDTypography>
-                <Grid container>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
-                    <Button onClick={() => handleDetail(post)}>Detail</Button>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Button onClick={() => handleModify(post)}>Modify</Button>
-                  </Grid>
-                  <Grid item xs={1}>
-                    <Button onClick={() => handleDelete(post.id)}>Delete</Button>
-                  </Grid>
-                </Grid>
               </MDBox>
             </Card>
           </MDBox>
         ))}
-
-        <Dialog
-          open={open}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={handleClose}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle>{dialogTitle}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-              {dialogMessage}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>OK</Button>
-          </DialogActions>
-        </Dialog>
       </MDBox>
 
       <MDPagination>
@@ -214,4 +134,4 @@ function MyPosts() {
   );
 }
 
-export default MyPosts;
+export default Alarm;

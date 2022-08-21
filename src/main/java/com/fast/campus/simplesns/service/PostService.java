@@ -4,6 +4,7 @@ import com.fast.campus.simplesns.exception.ErrorCode;
 import com.fast.campus.simplesns.exception.SimpleSnsApplicationException;
 import com.fast.campus.simplesns.model.AlarmArgs;
 import com.fast.campus.simplesns.model.AlarmType;
+import com.fast.campus.simplesns.model.Comment;
 import com.fast.campus.simplesns.model.Post;
 import com.fast.campus.simplesns.model.entity.*;
 import com.fast.campus.simplesns.repository.*;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -41,6 +44,11 @@ public class PostService {
                 .orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
         return postEntityRepository.findAllByUser(userEntity, pageable).map(Post::fromEntity);
     }
+
+    public Post get(Integer postId) {
+        return postEntityRepository.findById(postId).map(Post::fromEntity).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+    }
+
 
     @Transactional
     public Post modify(String userName, Integer postId, String title, String body) {
@@ -80,6 +88,11 @@ public class PostService {
         alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser()));
     }
 
+    public Page<Comment> getComments(Integer postId, Pageable pageable) {
+        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+        return commentEntityRepository.findAllByPost(postEntity, pageable).map(Comment::fromEntity);
+    }
+
     @Transactional
     public void like(Integer postId, String userName) {
         PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
@@ -97,5 +110,10 @@ public class PostService {
 
     }
 
+    public Integer getLikeCount(Integer postId) {
+        PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
+        List<LikeEntity> likes = likeEntityRepository.findAllByPost(postEntity);
+        return likes.size();
+    }
 
 }

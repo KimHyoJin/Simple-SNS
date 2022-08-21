@@ -41,7 +41,7 @@ import Post from 'layouts/post';
 import MyPosts from 'layouts/myposts';
 import SignIn from 'layouts/authentication/sign-in';
 import SignUp from 'layouts/authentication/sign-up';
-
+import Alarm from 'layouts/alarm';
 // @mui icons
 import Icon from '@mui/material/Icon';
 
@@ -81,6 +81,13 @@ const routes = [
     route: '/my-post',
     component: <MyPosts />,
   },
+  {
+      type: 'collapse',
+      name: 'Alarms',
+      key: 'alarms',
+      route: '/alarms',
+      component: <Alarm />,
+    },
 ];
 
 export default routes;
