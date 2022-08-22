@@ -34,7 +34,7 @@ public class PostEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany
+    @OneToMany()
     @JoinColumn(name = "post_id")
     private List<CommentEntity> comments;
 
