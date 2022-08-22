@@ -19,7 +19,6 @@ public class Post {
 
     private User user;
 
-
     private Timestamp registeredAt;
 
     private Timestamp updatedAt;
