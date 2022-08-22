@@ -131,7 +131,7 @@ function Feed() {
                   </Grid>
                   <Grid item xs={6}>
                     <MDTypography variant="body2" textAlign="right">
-                      {post.user.name}
+                      {post.user.userName}
                     </MDTypography>
                   </Grid>
                 </Grid>
