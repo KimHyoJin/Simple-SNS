@@ -7,6 +7,7 @@ import com.fast.campus.simplesns.model.User;
 import com.fast.campus.simplesns.model.entity.UserEntity;
 import com.fast.campus.simplesns.repository.AlarmEntityRepository;
 import com.fast.campus.simplesns.repository.UserEntityRepository;
+import com.fast.campus.simplesns.repository.infra.RedisRepository;
 import com.fast.campus.simplesns.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ public class UserService {
     private final UserEntityRepository userRepository;
     private final AlarmEntityRepository alarmEntityRepository;
     private final BCryptPasswordEncoder encoder;
+    private final RedisRepository redisRepository;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -33,13 +35,15 @@ public class UserService {
 
 
     public User loadUserByUsername(String userName) throws UsernameNotFoundException {
-        return userRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(
-                () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))
-        );
+        return redisRepository.getUser(userName).orElseGet(
+                () -> userRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(
+                        () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))
+                ));
     }
 
     public String login(String userName, String password) {
         User savedUser = loadUserByUsername(userName);
+        redisRepository.setUser(savedUser);
         if (!encoder.matches(password, savedUser.getPassword())) {
             throw new SimpleSnsApplicationException(ErrorCode.INVALID_PASSWORD);
         }

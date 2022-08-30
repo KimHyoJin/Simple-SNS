@@ -13,6 +13,12 @@ spring.jpa:
   properties.hibernate.format_sql: true
   show-sql: true
 
+spring.redis:
+  url: redis://:p8e682aad12b7caf6e8a4d75769964a337be7324cd4634764d238a7c4f53b357e@ec2-34-203-148-111.compute-1.amazonaws.com:30799
+  port: 30800
+  host: ec2-34-203-148-111.compute-1.amazonaws.com
+  password: p8e682aad12b7caf6e8a4d75769964a337be7324cd4634764d238a7c4f53b357e
+
 jwt:
   secret-key: fast-campus.simple_sns_2022_secret_key
   # 30 days
