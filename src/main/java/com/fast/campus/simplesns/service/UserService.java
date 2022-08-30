@@ -59,10 +59,7 @@ public class UserService {
     }
 
     @Transactional
-    public Page<Alarm> alarmList(String userName, Pageable pageable) {
-        UserEntity user = userRepository.findByUserName(userName).orElseThrow(
-                () -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName))
-        );
-        return alarmEntityRepository.findAllByUser(user, pageable).map(Alarm::fromEntity);
+    public Page<Alarm> alarmList(Integer userId, Pageable pageable) {
+        return alarmEntityRepository.findAllByUserId(userId, pageable).map(Alarm::fromEntity);
     }
 }

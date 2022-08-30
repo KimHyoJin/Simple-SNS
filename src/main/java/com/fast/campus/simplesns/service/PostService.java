@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -39,34 +40,28 @@ public class PostService {
         return postEntityRepository.findAll(pageable).map(Post::fromEntity);
     }
 
-    public Page<Post> my(String userName, Pageable pageable) {
-        UserEntity userEntity = userEntityRepository.findByUserName(userName)
-                .orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
-        return postEntityRepository.findAllByUser(userEntity, pageable).map(Post::fromEntity);
+    public Page<Post> my(Integer userId, Pageable pageable) {
+        return postEntityRepository.findAllByUserId(userId, pageable).map(Post::fromEntity);
     }
 
     @Transactional
-    public Post modify(String userName, Integer postId, String title, String body) {
+    public Post modify(Integer userId, Integer postId, String title, String body) {
         PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
-        UserEntity userEntity = userEntityRepository.findByUserName(userName)
-                .orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
-        if (postEntity.getUser() != userEntity) {
-            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userName, postId));
+        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
+            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
         }
 
         postEntity.setTitle(title);
         postEntity.setBody(body);
 
-        return Post.fromEntity(postEntityRepository.save(postEntity));
+        return Post.fromEntity(postEntityRepository.saveAndFlush(postEntity));
     }
 
     @Transactional
-    public void delete(String userName, Integer postId) {
+    public void delete(Integer userId, Integer postId) {
         PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
-        UserEntity userEntity = userEntityRepository.findByUserName(userName)
-                .orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("userName is %s", userName)));
-        if (postEntity.getUser() != userEntity) {
-            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userName, postId));
+        if (!Objects.equals(postEntity.getUser().getId(), userId)) {
+            throw new SimpleSnsApplicationException(ErrorCode.INVALID_PERMISSION, String.format("user %s has no permission with post %d", userId, postId));
         }
         postEntityRepository.delete(postEntity);
     }
