@@ -45,11 +45,6 @@ public class PostService {
         return postEntityRepository.findAllByUser(userEntity, pageable).map(Post::fromEntity);
     }
 
-    public Post get(Integer postId) {
-        return postEntityRepository.findById(postId).map(Post::fromEntity).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
-    }
-
-
     @Transactional
     public Post modify(String userName, Integer postId, String title, String body) {
         PostEntity postEntity = postEntityRepository.findById(postId).orElseThrow(() -> new SimpleSnsApplicationException(ErrorCode.POST_NOT_FOUND, String.format("postId is %d", postId)));
