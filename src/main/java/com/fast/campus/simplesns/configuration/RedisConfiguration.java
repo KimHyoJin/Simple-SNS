@@ -5,6 +5,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.data.redis.LettuceClientConfigurationBuilderCustomizer;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -18,6 +19,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 @Configuration
@@ -41,6 +43,14 @@ public class RedisConfiguration {
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<User>(User.class));
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, SseEmitter> emitterRedisTemplate() {
+        RedisTemplate<String, SseEmitter> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<SseEmitter>(SseEmitter.class));
         return redisTemplate;
     }
 

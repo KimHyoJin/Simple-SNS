@@ -1,4 +1,4 @@
-package com.fast.campus.simplesns.repository.infra;
+package com.fast.campus.simplesns.repository;
 
 import com.fast.campus.simplesns.model.User;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Optional;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class RedisRepository {
+public class UserCacheRepository {
 
     private final RedisTemplate<String, User> userRedisTemplate;
 

@@ -8,7 +8,7 @@ import com.fast.campus.simplesns.model.Comment;
 import com.fast.campus.simplesns.model.Post;
 import com.fast.campus.simplesns.model.entity.*;
 import com.fast.campus.simplesns.repository.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostService {
 
     private final UserEntityRepository userEntityRepository;
@@ -26,6 +26,7 @@ public class PostService {
     private final CommentEntityRepository commentEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
     private final AlarmEntityRepository alarmEntityRepository;
+    private final AlarmService notificationService;
 
     @Transactional
     public void create(String userName, String title, String body) {
@@ -77,7 +78,8 @@ public class PostService {
         commentEntityRepository.save(CommentEntity.of(comment, postEntity, userEntity));
 
         // create alarm
-        alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser()));
+        notificationService.send(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser());
+
     }
 
     public Page<Comment> getComments(Integer postId, Pageable pageable) {
@@ -98,8 +100,7 @@ public class PostService {
         likeEntityRepository.save(LikeEntity.of(postEntity, userEntity));
 
         // create alarm
-        alarmEntityRepository.save(AlarmEntity.of(AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser()));
-
+        notificationService.send(AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser());
     }
 
     public Integer getLikeCount(Integer postId) {

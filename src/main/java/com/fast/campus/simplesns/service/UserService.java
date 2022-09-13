@@ -6,8 +6,9 @@ import com.fast.campus.simplesns.model.Alarm;
 import com.fast.campus.simplesns.model.User;
 import com.fast.campus.simplesns.model.entity.UserEntity;
 import com.fast.campus.simplesns.repository.AlarmEntityRepository;
+import com.fast.campus.simplesns.repository.EmitterRepository;
 import com.fast.campus.simplesns.repository.UserEntityRepository;
-import com.fast.campus.simplesns.repository.infra.RedisRepository;
+import com.fast.campus.simplesns.repository.UserCacheRepository;
 import com.fast.campus.simplesns.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +29,9 @@ public class UserService {
     private final UserEntityRepository userRepository;
     private final AlarmEntityRepository alarmEntityRepository;
     private final BCryptPasswordEncoder encoder;
-    private final RedisRepository redisRepository;
+    private final UserCacheRepository redisRepository;
+
+
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -66,4 +72,5 @@ public class UserService {
     public Page<Alarm> alarmList(Integer userId, Pageable pageable) {
         return alarmEntityRepository.findAllByUserId(userId, pageable).map(Alarm::fromEntity);
     }
+
 }
