@@ -2,11 +2,9 @@ package com.fast.campus.simplesns.service;
 
 import com.fast.campus.simplesns.exception.ErrorCode;
 import com.fast.campus.simplesns.exception.SimpleSnsApplicationException;
-import com.fast.campus.simplesns.model.AlarmArgs;
-import com.fast.campus.simplesns.model.AlarmType;
-import com.fast.campus.simplesns.model.Comment;
-import com.fast.campus.simplesns.model.Post;
+import com.fast.campus.simplesns.model.*;
 import com.fast.campus.simplesns.model.entity.*;
+import com.fast.campus.simplesns.producer.AlarmProducer;
 import com.fast.campus.simplesns.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,8 +23,7 @@ public class PostService {
     private final PostEntityRepository postEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
-    private final AlarmEntityRepository alarmEntityRepository;
-    private final AlarmService notificationService;
+    private final AlarmProducer alarmProducer;
 
     @Transactional
     public void create(String userName, String title, String body) {
@@ -78,8 +75,8 @@ public class PostService {
         commentEntityRepository.save(CommentEntity.of(comment, postEntity, userEntity));
 
         // create alarm
-        notificationService.send(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser());
-
+        // notificationService.send(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser());
+        alarmProducer.send(new AlarmEvent(AlarmType.NEW_COMMENT_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser().getId()));
     }
 
     public Page<Comment> getComments(Integer postId, Pageable pageable) {
@@ -100,7 +97,8 @@ public class PostService {
         likeEntityRepository.save(LikeEntity.of(postEntity, userEntity));
 
         // create alarm
-        notificationService.send(AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser());
+        //otificationService.send(AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser());
+        alarmProducer.send(new AlarmEvent(AlarmType.NEW_LIKE_ON_POST, new AlarmArgs(userEntity.getId(), postId), postEntity.getUser().getId()));
     }
 
     public Integer getLikeCount(Integer postId) {
